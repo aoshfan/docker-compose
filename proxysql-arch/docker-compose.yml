@@ -72,7 +72,7 @@ services:
       - master
     container_name: sysbench
     hostname: sysbench
-    image: aoshfan/sysbench:1.0.20.1
+    image: aoshfan/sysbench-mysql:1.0.20.1
     entrypoint: ["bash","-c","while true; do sleep 2; done"]
     networks:
       - proxysql-net
