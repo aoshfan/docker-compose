@@ -16,6 +16,9 @@ Below is the list what included in docker-compose.
 ### How to connect:
 1. ProxySQL  
     * mysql -h127.0.0.1 -P16032 -uradmin -pradmin --prompt "ProxySQL Admin>"
+2. Sysbench
+     1. Exec into the *sysbench* container.
+     2. $ mysql -h proxysql -P6032 -u radmin -p'radmin' --prompt='Admin> ' # make sure proxysql have user radmin:radmin.
 2. Other containers
    * docker exec -it <container-name> bash # You can replace bash with any argument. 
 
