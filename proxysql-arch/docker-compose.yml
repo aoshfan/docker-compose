@@ -2,10 +2,12 @@ version: '3'
 
 services:
   master:
+    container_name: master
+    hostname: master
     image: mysql:5.7.32
     restart: "no"
     ports:
-      - "33066:3306"
+      - "13066:3306"
     environment:
       MYSQL_DATABASE: sysbench
       MYSQL_USER: sbtest
@@ -20,10 +22,12 @@ services:
   slave:
     depends_on:
       - master
+    container_name: slave
+    hostname: slave
     image: mysql:5.7.32
     restart: "no"
     ports:
-      - "33067:3306"
+      - "13067:3306"
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes: 
@@ -36,6 +40,8 @@ services:
     depends_on:
       - master
       - slave
+    container_name: mysqlconfigure
+    hostname: mysqlconfigure
     image: mysql:5.7.32
     entrypoint: ["bash","-x","/configure-master-slave.sh"]
     volumes:
@@ -48,7 +54,15 @@ services:
   proxysql:
     depends_on:
       - master
+    container_name: proxysql
+    hostname: proxysql
     image: proxysql/proxysql:2.0.15
+    restart: always
+    ports:
+      - 16032:6032
+      - 16033:6033
+    volumes:
+      - ./config/proxysql/proxysql.cnf:/etc/proxysql.cnf
     networks:
       - proxysql-net
 
@@ -56,6 +70,8 @@ services:
     depends_on:
       - proxysql
       - master
+    container_name: sysbench
+    hostname: sysbench
     image: aoshfan/sysbench:1.0.20.1
     entrypoint: ["bash","-c","while true; do sleep 2; done"]
     networks:
