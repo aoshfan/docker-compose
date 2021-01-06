@@ -1,7 +1,15 @@
 #!/bin/bash
 
-echo "SLEEPING NOW"
-sleep 60
+echo "Check Slave Uptime."
+UPTIME=$(mysqladmin -h slave -u root status | awk '{print $2}')
+if [ "$UPTIME" -gt "60" ]; then
+  echo "Slave uptime is ${UPTIME} more than 60 seconds";
+  echo "Master-Slave configuration is cancelled now";
+  exit 0
+fi
+
+echo "SLEEPING 30 seconds before do MySQL Master-Slave configuration"
+sleep 30
 echo "CREATE USER & GRANT"
 mysql -h master -u root -e "CREATE USER 'replication_user'@'%' IDENTIFIED BY 'replication_password'; GRANT REPLICATION SLAVE ON *.* TO 'replication_user'@'%'; FLUSH PRIVILEGES;"
 echo "GETTING BINLOG NAME"
