@@ -1,5 +1,5 @@
 # ProxySQL
-I creted this docker compose because want to test ProxySQL on Master-Slave MySQL database.  
+I creted this docker compose to test ProxySQL on Master-Slave MySQL database.  
 Below is the list what included in docker-compose.
 1. MySQL Master (container name: master)
 2. MySQL Slave (container name: slave)
