@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  master:
+    image: mysql:5.7.32
+    restart: "no"
+    ports:
+      - "33066:3306"
+    environment:
+      MYSQL_DATABASE: sysbench
+      MYSQL_USER: sbtest
+      MYSQL_PASSWORD: sbtest
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes: 
+#      - ./data/master:/var/lib/mysql
+      - ./config/master/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
+    networks:
+      - proxysql-net
+
+  slave:
+    depends_on:
+      - master
+    image: mysql:5.7.32
+    restart: "no"
+    ports:
+      - "33067:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes: 
+#      - ./data/slave:/var/lib/mysql
+      - ./config/slave/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
+    networks:
+      - proxysql-net
+
+  mysqlconfigure:
+    depends_on:
+      - master
+      - slave
+    image: mysql:5.7.32
+    entrypoint: ["bash","-x","/configure-master-slave.sh"]
+    volumes:
+      - ./mysql-configure/configure-master-slave.sh:/configure-master-slave.sh
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    networks:
+      - proxysql-net
+
+  proxysql:
+    depends_on:
+      - master
+    image: proxysql/proxysql:2.0.15
+    networks:
+      - proxysql-net
+
+  sysbench:
+    depends_on:
+      - proxysql
+      - master
+    image: aoshfan/sysbench:1.0.20.1
+    entrypoint: ["bash","-c","while true; do sleep 2; done"]
+    networks:
+      - proxysql-net
+
+networks:
+  proxysql-net:
+    driver: bridge
